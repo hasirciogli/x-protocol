@@ -1,2 +1,0 @@
-packages:
-  - "packages/*"  # Mono repo içinde tüm alt paketleri bul
