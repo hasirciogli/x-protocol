@@ -23,7 +23,6 @@ jobs:
       - name: Build TS library
         run: |
           cd packages/ts
+          npm login --registry=https://registry.npmjs.org/ --username=hasirciogli --password=${{ secrets.NPM_SECRET }}
           pnpm build
           pnpm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_SECRET }}
