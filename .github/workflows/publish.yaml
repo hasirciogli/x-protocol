@@ -19,10 +19,15 @@ jobs:
           cd packages/ts
           npm install -g pnpm
           pnpm install
+      - name: Authenticate with NPM
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_SECRET }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
 
       - name: Build TS library
         run: |
           cd packages/ts
-          npm login --registry=https://registry.npmjs.org/ --username=hasirciogli --password=${{ secrets.NPM_SECRET }}
+          npm login --registry=https://registry.npmjs.org/ --username=hasirciogli --scope=@hasirciogli --email=hasirciogli@gmail.com --token=${{ secrets.NPM_SECRET }}
           pnpm build
           pnpm publish
