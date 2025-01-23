@@ -8,5 +8,12 @@
   },
   "devDependencies": {
     "typescript": "^5.0.0"
+  },
+  "publishConfig": {
+    "tag": "latest",
+    "access": "public",
+    "ignore": [
+      "src"
+    ]
   }
 }
