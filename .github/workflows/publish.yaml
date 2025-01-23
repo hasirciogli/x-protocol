@@ -14,38 +14,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build TypeScript library
-        run: pnpm --filter @myorg/ts-lib build
-
-      - name: Publish TypeScript package
-        run: pnpm --filter @myorg/ts-lib publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_SECRET }}
-
-  build-go:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Install dependencies
-        run: pnpm install
-      - name: pnpm login
-        run: pnpm login --registry=https://registry.npmjs.org/ --username=hasirciogli --password=${{ secrets.NPM_SECRET }}
+      - name: Install
+        run: |
+          cd packages/ts
+          npm install -g pnpm
+          pnpm install
 
       - name: Build TS library
         run: |
-            cd packages/ts
-            pnpm build
-            pnpm publish
+          cd packages/ts
+          pnpm build
+          pnpm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_SECRET }}
