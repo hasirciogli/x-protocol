@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "packages/**"
 
 jobs:
   build-ts:
@@ -31,3 +29,5 @@ jobs:
           npm login --registry=https://registry.npmjs.org/ --username=hasirciogli --scope=@hasirciogli --email=hasirciogli@gmail.com --token=${{ secrets.NPM_SECRET }}
           pnpm build
           pnpm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_SECRET }}
