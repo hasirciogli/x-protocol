@@ -66,7 +66,17 @@ Bu proje, RPC akrabası olan bir çağrı sistemi geliştirmek amacıyla oluştu
 1. **Nodejs Paketlerini Yükleyin:**
 
    ```bash
-   pnpm add @hasirciogli/x-protocol
+   pnpm add x-protocol
+   ```
+
+2. **Örnek Client Oluşturun:**
+
+   ```typescript
+   import { XProtocolClient } from "x-protocol";
+
+   const client = new XProtocolClient("localhost", 8080);
+   const response = await client.call("hello", { name: "world" });
+   console.log(response);
    ```
 
 ## 🛠️ Özellikler

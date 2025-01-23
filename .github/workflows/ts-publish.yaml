@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "packages/ts/**"
+      - "packages/ts/package.json"
 
 jobs:
   build-and-publish:
