@@ -129,3 +129,27 @@ Herhangi bir sorunuz veya öneriniz varsa, lütfen benimle iletişime geçin:
 ---
 
 **Teşekkürler! Projemi incelediğiniz için teşekkür ederiz!**
+
+.
+
+# Basit Bağlantı Stress Testi
+
+Test yapılırken homelab kullanıldı cloudflare zerotrust ile dışarıya açılıp ağ gecikmesi ile beraber olası kopmalar göz önüne alınarak test yapıldı. Ayrıca tek makineden yapıldığı için hata oluştu, multi node ile test yapılsaydı veya proxy ile bu hatalar oluşmazdı.
+
+connection-test.ts dosyasında test yapılmıştır. Dilerseniz kendi testlerinizi yapabilirsiniz.
+
+```bash
+npx tsx connection-test.ts
+```
+
+Test sonucu:
+
+```bash
+Test tamamlandı!
+Test süresi: 241.42 saniye
+Toplam istek sayısı: 17000
+Başarı sayısı: 16996
+Hata sayısı: 4
+Başarı oranı: 99.98%
+Hata oranı: 0.02%
+```

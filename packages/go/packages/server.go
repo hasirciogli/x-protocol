@@ -11,26 +11,29 @@ import (
 
 // Generic type T
 type XProtocolServer struct {
-	Host      string                         `json:"host"`
-	Port      int                            `json:"port"`
-	ProxyMode bool                           `json:"proxy_mode"`
-	Calls     map[string]XProtocolServerCall `json:"calls"`
+	Host          string                           `json:"host"`
+	Port          int                              `json:"port"`
+	ProxyMode     bool                             `json:"proxy_mode"`
+	Calls         map[string]XProtocolServerCall   `json:"calls"`
+	ProxyChannels map[string]XProtocolProxyChannel `json:"proxy_channels"`
 }
 
 type XProtocolServerCall struct {
-	Name    string                                        `json:"name"`
-	Handler func(payload json.RawMessage) json.RawMessage `json:"handler"`
+	Name             string                                              `json:"name"`
+	Handler          func(payload json.RawMessage) XProtocolCallResponse `json:"handler"`
+	FromProxyChannel *XProtocolProxyChannel                              `json:"from_proxy_channel"`
 }
 
 type XProtocolCallRequest struct {
-	Name    string          `json:"name"`
-	Payload json.RawMessage `json:"payload"`
+	Name             string                 `json:"name"`
+	Payload          json.RawMessage        `json:"payload"`
+	FromProxyChannel *XProtocolProxyChannel `json:"from_proxy_channel"`
 }
 
 type XProtocolCallResponse struct {
-	Success bool            `json:"success"`
-	Data    json.RawMessage `json:"data"`
-	Error   string          `json:"error"`
+	Success bool   `json:"success"`
+	Data    any    `json:"data"`
+	Error   string `json:"error"`
 }
 
 func NewXProtocolServer(host string, port int) *XProtocolServer {
@@ -66,10 +69,7 @@ func (s *XProtocolServer) Start() {
 				return
 			}
 
-			response := XProtocolCallResponse{
-				Success: true,
-				Data:    call.Handler(callRequest.Payload),
-			}
+			response := call.Handler(callRequest.Payload)
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
 			return
@@ -80,20 +80,55 @@ func (s *XProtocolServer) Start() {
 	http.ListenAndServe(fmt.Sprintf("%s:%d", s.Host, s.Port), mux)
 }
 
-func (s *XProtocolServer) RegisterCall(name string, handler func(payload json.RawMessage) json.RawMessage) {
+func (s *XProtocolServer) RegisterCall(name string, handler func(payload json.RawMessage) XProtocolCallResponse) {
 	s.Calls[name] = XProtocolServerCall{
 		Name:    name,
 		Handler: handler,
 	}
+
+	fmt.Println("call registered -> " + name + " ✔️")
 }
 
 func (s *XProtocolServer) RegisterCallWithPayload(name string, handler interface{}) {
 	s.Calls[name] = XProtocolServerCall{
 		Name: name,
-		Handler: func(payload json.RawMessage) json.RawMessage {
+		Handler: func(payload json.RawMessage) XProtocolCallResponse {
 			p := reflect.New(reflect.TypeOf(handler).In(0)).Interface()
 			json.Unmarshal(payload, &p)
-			return handler.(func(p interface{}) json.RawMessage)(p)
+			return handler.(func(p interface{}) XProtocolCallResponse)(p)
 		},
+	}
+
+	fmt.Println("call registered -> " + name + " ✔️")
+}
+
+// proxy channel start
+
+func (s *XProtocolServer) RegisterProxyChannel(name string, host string, port int) {
+	s.ProxyChannels[name] = XProtocolProxyChannel{
+		Name: name,
+		Host: host,
+		Port: port,
+	}
+
+	fmt.Println("proxy channel registered -> " + name + " | " + host + ":" + strconv.Itoa(port) + " ✔️")
+}
+
+func (s *XProtocolServer) GetProxyChannel(name string) XProtocolProxyChannel {
+	return s.ProxyChannels[name]
+}
+
+func (s *XProtocolServer) GetProxyChannelHost(name string) string {
+	return s.ProxyChannels[name].Host
+}
+
+func (s *XProtocolServer) GetProxyChannelPort(name string) int {
+	return s.ProxyChannels[name].Port
+}
+
+func (s *XProtocolServer) UpdateProxyChannel(name string, host string, port int) {
+	s.ProxyChannels[name] = XProtocolProxyChannel{
+		Host: host,
+		Port: port,
 	}
 }

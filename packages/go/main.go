@@ -13,16 +13,17 @@ type HelloPayload struct {
 
 func main() {
 	server := packages.NewXProtocolServer("localhost", 8080)
-	server.RegisterCall("hello", func(payload json.RawMessage) json.RawMessage {
+	server.RegisterCall("hello", func(payload json.RawMessage) packages.XProtocolCallResponse {
 		var p HelloPayload
 		p.Message = "hello"
 		p.Name = "world"
 
-		str, err := json.Marshal(p)
-		if err != nil {
-			return json.RawMessage(`{"error": "` + err.Error() + `"}`)
+		json.Unmarshal(payload, &p)
+
+		return packages.XProtocolCallResponse{
+			Success: true,
+			Data:    p,
 		}
-		return json.RawMessage(str)
 	})
 	server.Start()
 }
