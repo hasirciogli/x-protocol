@@ -159,4 +159,4 @@ Hata oranı: 0.02%
 
 ## Farklı programlama dilleri arası test + proxy test :D
 
-![image](https://github.com/hasirciogli/x-protocol/assets/images/x-protocol-multi-language-test.gif)
+![x-protocol-multi-language-test](assets/images/x-protocol-multi-language-test.gif)
