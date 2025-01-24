@@ -127,7 +127,7 @@ Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
 Herhangi bir sorunuz veya öneriniz varsa, lütfen benimle iletişime geçin:
 
 - **E-posta:** mhasirciogli@gmail.com
-- **GitHub:** [hasircioglu](https://github.com/hasircioglu)
+- **GitHub:** [hasirciogli](https://github.com/hasirciogli)
 
 ---
 
