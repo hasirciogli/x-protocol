@@ -1,4 +1,4 @@
-# Proje Adı: Mikroservisler ve ara servisler için x-protocol
+# Mikroservisler ve ara servisler için x-protocol
 
 ## 📖 Proje Hakkında
 
