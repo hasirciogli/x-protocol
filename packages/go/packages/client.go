@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 )
 
 type XProtocolClient struct {
@@ -34,6 +35,11 @@ func (c *XProtocolClient) Call(xprotoCallRequest XProtocolClientCallRequest) XPr
 			Data:    nil,
 			Error:   &errString,
 		}
+	}
+
+	appMode := os.Getenv("APP_MODE")
+	if appMode == "development" {
+		fmt.Println("Call isteği gönderildi -> " + xprotoCallRequest.Name)
 	}
 
 	parsedBody := string(bodyTextJsonBytes)
@@ -84,6 +90,10 @@ func (c *XProtocolClient) Call(xprotoCallRequest XProtocolClientCallRequest) XPr
 	// if reflect.TypeOf(response.Data).Kind() == reflect.String {
 	// 	response.Data = json.RawMessage(response.Data.(string))
 	// }
+
+	if appMode == "development" {
+		fmt.Println("Call yanıtı alındı -> " + string(response.Data))
+	}
 
 	return XProtocolClientCallResponse{
 		Success: true,

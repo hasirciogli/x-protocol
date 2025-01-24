@@ -67,7 +67,7 @@ func Login(payload json.RawMessage) packages.XProtocolCallResponse {
 	}
 
 	return packages.XProtocolCallResponse{
-		Success: true,
+		Success: false,
 		Data:    json.RawMessage(jsonBytes),
 		Error:   nil,
 	}

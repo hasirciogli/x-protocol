@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"reflect"
+	"os"
 	"strconv"
 )
 
-// Generic type T
 type XProtocolServer struct {
 	Host          string                           `json:"host"`
 	Port          int                              `json:"port"`
@@ -19,9 +18,8 @@ type XProtocolServer struct {
 }
 
 type XProtocolServerCall struct {
-	Name             string                                              `json:"name"`
-	Handler          func(payload json.RawMessage) XProtocolCallResponse `json:"handler"`
-	FromProxyChannel *XProtocolProxyChannel                              `json:"from_proxy_channel"`
+	Name    string                                              `json:"name"`
+	Handler func(payload json.RawMessage) XProtocolCallResponse `json:"handler"`
 }
 
 type XProtocolCallRequest struct {
@@ -77,8 +75,8 @@ func (s *XProtocolServer) Start() {
 				if response.Error != nil {
 					if response.ProxyServerError {
 						w.Header().Set("Content-Type", "plain/text")
-						w.WriteHeader(http.StatusInternalServerError)
-						w.Write([]byte(*response.Error))
+						w.WriteHeader(*response.ProxyStatus)
+						w.Write([]byte(*response.ProxyError))
 					} else {
 						w.Header().Set("Content-Type", "plain/text")
 						w.WriteHeader(http.StatusInternalServerError)
@@ -101,6 +99,12 @@ func (s *XProtocolServer) Start() {
 			if !ok {
 				http.Error(w, "Call not found", http.StatusNotFound)
 				return
+			}
+			fmt.Println("Call isteği alındı -> "+callRequest.Name+" | from proxy:", callRequest.FromProxyChannel != nil)
+
+			appMode := os.Getenv("APP_MODE")
+			if appMode == "development" {
+				fmt.Println("Call isteği alındı -> "+callRequest.Name+" | from proxy:", callRequest.FromProxyChannel != nil)
 			}
 
 			response := call.Handler(callRequest.Payload)
@@ -125,20 +129,7 @@ func (s *XProtocolServer) RegisterCall(name string, handler func(payload json.Ra
 		Handler: handler,
 	}
 
-	fmt.Println("call registered -> " + name + " ✔️")
-}
-
-func (s *XProtocolServer) RegisterCallWithPayload(name string, handler interface{}) {
-	s.Calls[name] = XProtocolServerCall{
-		Name: name,
-		Handler: func(payload json.RawMessage) XProtocolCallResponse {
-			p := reflect.New(reflect.TypeOf(handler).In(0)).Interface()
-			json.Unmarshal(payload, &p)
-			return handler.(func(p interface{}) XProtocolCallResponse)(p)
-		},
-	}
-
-	fmt.Println("call registered -> " + name + " ✔️")
+	fmt.Println("Call registered -> " + name + " ✔️")
 }
 
 // proxy channel start

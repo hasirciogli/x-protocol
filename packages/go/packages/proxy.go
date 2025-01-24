@@ -6,21 +6,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 )
-
-type XProtocolProxyService struct {
-	Host      string `json:"host"`
-	Port      int    `json:"port"`
-	ProxyMode bool   `json:"proxy_mode"`
-}
 
 type XProtocolProxyChannel struct {
 	Name string `json:"name"`
-	Host string `json:"host"`
-	Port int    `json:"port"`
-}
-
-type XProtocolProxyServiceClient struct {
 	Host string `json:"host"`
 	Port int    `json:"port"`
 }
@@ -32,13 +22,6 @@ type XProtocolProxyCallResponse struct {
 	ProxyStatus      *int    `json:"proxy_status"`
 	ProxyError       *string `json:"proxy_error"`
 	ProxyServerError bool    `json:"proxy_server_error"`
-}
-
-func NewXProtocolProxyServiceClient(host string, port int) *XProtocolProxyServiceClient {
-	return &XProtocolProxyServiceClient{
-		Host: host,
-		Port: port,
-	}
 }
 
 func (s *XProtocolProxyChannel) Call(name string, xprotoCallRequest XProtocolCallRequest) XProtocolProxyCallResponse {
@@ -61,6 +44,11 @@ func (s *XProtocolProxyChannel) Call(name string, xprotoCallRequest XProtocolCal
 			ProxyError:       nil,
 			ProxyServerError: false,
 		}
+	}
+
+	appMode := os.Getenv("APP_MODE")
+	if appMode == "development" {
+		fmt.Println("Proxy isteği yönlendirdi -> " + fmt.Sprintf("http://%s:%d", s.Host, s.Port))
 	}
 
 	parsedBody := string(bodyTextJsonBytes)

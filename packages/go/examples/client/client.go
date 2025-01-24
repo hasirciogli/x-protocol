@@ -17,7 +17,7 @@ func main() {
 		Password: "123456",
 	}
 
-	var proxyChannelName = "" // blank or nil means no proxy channel is used
+	var proxyChannelName = "p1" // blank or nil means no proxy channel is used
 
 	jsonBytes, err := json.Marshal(testRequest)
 	if err != nil {
