@@ -25,23 +25,25 @@ type XProtocolServerCall struct {
 }
 
 type XProtocolCallRequest struct {
+	ProxyChannelName *string                `json:"proxy_channel_name"`
 	Name             string                 `json:"name"`
 	Payload          json.RawMessage        `json:"payload"`
 	FromProxyChannel *XProtocolProxyChannel `json:"from_proxy_channel"`
 }
 
 type XProtocolCallResponse struct {
-	Success bool   `json:"success"`
-	Data    any    `json:"data"`
-	Error   string `json:"error"`
+	Success bool            `json:"success"`
+	Data    json.RawMessage `json:"data"`
+	Error   *string         `json:"error"`
 }
 
 func NewXProtocolServer(host string, port int) *XProtocolServer {
 	return &XProtocolServer{
-		Host:      host,
-		Port:      port,
-		ProxyMode: false,
-		Calls:     map[string]XProtocolServerCall{},
+		Host:          host,
+		Port:          port,
+		ProxyMode:     false,
+		Calls:         map[string]XProtocolServerCall{},
+		ProxyChannels: map[string]XProtocolProxyChannel{},
 	}
 }
 
@@ -63,6 +65,38 @@ func (s *XProtocolServer) Start() {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
+
+			if callRequest.ProxyChannelName != nil && *callRequest.ProxyChannelName != "" {
+				proxyChannel, ok := s.ProxyChannels[*callRequest.ProxyChannelName]
+				if !ok {
+					http.Error(w, "Proxy channel not found", http.StatusNotFound)
+					return
+				}
+
+				response := proxyChannel.Call(callRequest.Name, callRequest)
+				if response.Error != nil {
+					if response.ProxyServerError {
+						w.Header().Set("Content-Type", "plain/text")
+						w.WriteHeader(http.StatusInternalServerError)
+						w.Write([]byte(*response.Error))
+					} else {
+						w.Header().Set("Content-Type", "plain/text")
+						w.WriteHeader(http.StatusInternalServerError)
+						w.Write([]byte(*response.Error))
+					}
+					return
+				}
+
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(XProtocolCallResponse{
+					Success: true,
+					Data:    json.RawMessage(response.Data),
+					Error:   nil,
+				})
+				return
+			}
+
 			call, ok := s.Calls[callRequest.Name]
 			if !ok {
 				http.Error(w, "Call not found", http.StatusNotFound)
@@ -71,7 +105,12 @@ func (s *XProtocolServer) Start() {
 
 			response := call.Handler(callRequest.Payload)
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(response)
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(XProtocolCallResponse{
+				Success: true,
+				Data:    response.Data,
+				Error:   nil,
+			})
 			return
 		} else {
 			w.Write([]byte("unknown"))
