@@ -16,10 +16,13 @@ Bu proje, RPC akrabası olan bir çağrı sistemi geliştirmek amacıyla oluştu
 
 1. **Go Modüllerini Yükleyin:**
 
+   Modül yüklemeye gerek yoktur. Direkt olarak:
+
    ```txt
-   Modül yüklemeye gerek yoktur.
-   Direkt olarak github.com/hasirciogli/x-protocol/packages/go/packages şeklinde import edebilirsiniz.
+    github.com/hasirciogli/x-protocol/packages/go/packages
    ```
+
+   şeklinde import edebilirsiniz.
 
 2. **Örnek Server Oluşturun:**
    main.go dosyasını aşağıdaki gibi oluşturun.
