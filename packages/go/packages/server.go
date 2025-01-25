@@ -110,11 +110,7 @@ func (s *XProtocolServer) Start() {
 			response := call.Handler(callRequest.Payload)
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(XProtocolCallResponse{
-				Success: true,
-				Data:    response.Data,
-				Error:   nil,
-			})
+			json.NewEncoder(w).Encode(response)
 			return
 		} else {
 			w.Write([]byte("unknown"))
