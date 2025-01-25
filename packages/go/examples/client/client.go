@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hasirciogli/x-protocol/packages/go/packages"
+	"github.com/hasirciogli/x-protocol/packages/go/src/packages"
 )
 
 func main() {

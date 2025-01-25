@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 
-	"github.com/hasirciogli/x-protocol/packages/go/packages"
+	"github.com/hasirciogli/x-protocol/packages/go/src/packages"
 )
 
 type LoginPayload struct {
