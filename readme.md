@@ -19,7 +19,7 @@ Bu proje, RPC akrabası olan bir çağrı sistemi geliştirmek amacıyla oluştu
    Modül yüklemeye gerek yoktur. Direkt olarak:
 
    ```txt
-    github.com/hasirciogli/x-protocol/packages/go/packages
+    github.com/hasirciogli/x-protocol/packages/go/src/packages
    ```
 
    şeklinde import edebilirsiniz.
@@ -33,7 +33,7 @@ Bu proje, RPC akrabası olan bir çağrı sistemi geliştirmek amacıyla oluştu
    import (
        "encoding/json"
 
-       "github.com/hasirciogli/x-protocol/packages/go/packages"
+       "github.com/hasirciogli/x-protocol/packages/go/src/packages"
    )
 
    type HelloPayload struct {
