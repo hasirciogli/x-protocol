@@ -7,6 +7,7 @@ export interface XProtocolClientCallResponse {
 }
 
 export interface XProtocolClientCallRequest {
+  token?: string; // token for auth
   proxyChannelName?: string; // proxy channel name for proxy mode xprotocol server
   name: string; // function name
   payload: any; // json.RawMessage
@@ -35,6 +36,9 @@ export class XProtocolClient {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(request.token
+            ? { Authorization: `Bearer ${request.token}` }
+            : {}),
         },
         body: bodyTextJson,
       });
@@ -55,11 +59,7 @@ export class XProtocolClient {
         );
       }
 
-      return {
-        success: true,
-        data: responseBody.data,
-        error: responseBody.error,
-      };
+      return responseBody;
     } catch (error) {
       return {
         success: false,

@@ -21,11 +21,14 @@ export type XProtocolCallResponseType = {
   error?: string;
 };
 
+export type AuthCallback = (authHeader: string) => Promise<boolean>;
+
 export class XProtocolServer {
   private host: string;
   private port: number;
   private calls: Map<string, XProtocolServerCallType>;
   private proxyChannels: Map<string, XProtocolProxyChannelType>;
+  private authCallbacks: AuthCallback[] = [];
 
   constructor(host: string, port: number) {
     this.host = host;
@@ -43,6 +46,33 @@ export class XProtocolServer {
   }
 
   public handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {
+    const authHeader = req.headers["authorization"];
+
+    const hasAnyAuthCallback = this.authCallbacks.length > 0;
+
+    if (hasAnyAuthCallback) {
+      if (authHeader) {
+        const authPromises = this.authCallbacks.map((callback) =>
+          callback(authHeader)
+        );
+        Promise.all(authPromises).then((results) => {
+          if (results.includes(false)) {
+            res.writeHead(403, { "Content-Type": "plain/text" });
+            res.end("Unauthorized");
+            return;
+          }
+          this.processRequest(req, res);
+        });
+      } else {
+        res.writeHead(403, { "Content-Type": "plain/text" });
+        res.end("Unauthorized");
+      }
+    } else {
+      this.processRequest(req, res);
+    }
+  }
+
+  private processRequest(req: http.IncomingMessage, res: http.ServerResponse) {
     if (req.url === "/calls" && req.method === "POST") {
       let body = "";
 
@@ -158,6 +188,11 @@ export class XProtocolServer {
   public registerProxyChannel(name: string, host: string, port: number) {
     this.proxyChannels.set(name, new XProtocolProxyChannel(name, host, port));
     console.log(`Proxy channel registered -> ${name} | ${host}:${port} ✔️`);
+  }
+
+  public registerAuthCallback(callback: AuthCallback) {
+    this.authCallbacks.push(callback);
+    console.log(`Auth callback registered ✔️`);
   }
 }
 
