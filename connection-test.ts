@@ -10,15 +10,15 @@ const REQUEST_BODY = {
 let successCount = 0;
 let failureCount = 0;
 let totalRequests = 0;
-const TEST_DURATION = 60 * 1000 * 4;
-const GROUP_LIMIT = 200; // Her grup için paralel istek sayısı
+const TEST_DURATION = 1000 * 0.01;
+const GROUP_LIMIT = 1; // Her grup için paralel istek sayısı
 
 // POST istekleri gönderen fonksiyon
 const sendRequests = async () => {
   const startTime = performance.now(); // Test başlama zamanı
   const endTime = startTime + TEST_DURATION; // Test bitiş zamanı
   let currentTime = startTime;
-  const URL = "https://x-protocol-test.hasirciogli.com/calls"; // URL
+  const URL = "http://localhost:8080/calls"; // URL
   const failedRequests: { request: number; error: any }[] = [];
 
   // Test süresi boyunca istek göndermeye devam et
@@ -33,6 +33,7 @@ const sendRequests = async () => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              // Authorization: "Bearer 123456",
             },
             body: JSON.stringify(REQUEST_BODY),
           });
@@ -46,6 +47,8 @@ const sendRequests = async () => {
               ).toFixed(2)} ms`
             );
           } else {
+            console.log(await response.text());
+
             throw new Error(
               `Request failed with status ${response.status} - ${response.statusText} and body ${response.body}`
             );

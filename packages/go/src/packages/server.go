@@ -9,12 +9,15 @@ import (
 	"strconv"
 )
 
+type AuthCallback func(authHeader string) bool
+
 type XProtocolServer struct {
 	Host          string                           `json:"host"`
 	Port          int                              `json:"port"`
 	ProxyMode     bool                             `json:"proxy_mode"`
 	Calls         map[string]XProtocolServerCall   `json:"calls"`
 	ProxyChannels map[string]XProtocolProxyChannel `json:"proxy_channels"`
+	AuthCallbacks []AuthCallback                   `json:"auth_callbacks"`
 }
 
 type XProtocolServerCall struct {
@@ -49,6 +52,22 @@ func (s *XProtocolServer) Start() {
 	fmt.Println("Starting XProtocolServer on http://" + s.Host + ":" + strconv.Itoa(s.Port))
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+
+		if len(s.AuthCallbacks) > 0 {
+			if authHeader == "" {
+				http.Error(w, "Unauthorized", http.StatusForbidden)
+				return
+			}
+
+			for _, callback := range s.AuthCallbacks {
+				if !callback(authHeader) {
+					http.Error(w, "Unauthorized", http.StatusForbidden)
+					return
+				}
+			}
+		}
+
 		if r.URL.Path == "/calls" && r.Method == "POST" {
 			body, err := io.ReadAll(r.Body)
 			if err != nil {
@@ -157,4 +176,9 @@ func (s *XProtocolServer) UpdateProxyChannel(name string, host string, port int)
 		Host: host,
 		Port: port,
 	}
+}
+
+func (s *XProtocolServer) RegisterAuthCallback(callback AuthCallback) {
+	s.AuthCallbacks = append(s.AuthCallbacks, callback)
+	fmt.Println("Auth callback registered ✔️")
 }

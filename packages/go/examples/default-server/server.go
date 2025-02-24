@@ -9,15 +9,17 @@ import (
 func Hello(payload json.RawMessage) packages.XProtocolCallResponse {
 	return packages.XProtocolCallResponse{
 		Success: true,
-		Data:    json.RawMessage(payload),
+		Data:    json.RawMessage(`{"message": "Hello, World!"}`),
 		Error:   nil,
 	}
 }
 
 func main() {
 	server := packages.NewXProtocolServer("localhost", 8080)
-	server.RegisterCall("hello", Hello)
-	server.RegisterProxyChannel("p1", "localhost", 8090)
+	// server.RegisterAuthCallback(func(authHeader string) bool {
+	// 	return authHeader == "Bearer 123456"
+	// })
 
+	server.RegisterCall("hello", Hello)
 	server.Start()
 }

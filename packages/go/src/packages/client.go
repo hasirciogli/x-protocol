@@ -24,6 +24,7 @@ type XProtocolClientCallRequest struct {
 	ProxyChannelName *string         `json:"proxy_channel_name"`
 	Name             string          `json:"name"`
 	Payload          json.RawMessage `json:"payload"`
+	Token            *string         `json:"token"`
 }
 
 func (c *XProtocolClient) Call(xprotoCallRequest XProtocolClientCallRequest) XProtocolClientCallResponse {
@@ -44,7 +45,23 @@ func (c *XProtocolClient) Call(xprotoCallRequest XProtocolClientCallRequest) XPr
 
 	parsedBody := string(bodyTextJsonBytes)
 
-	res, err := http.Post(fmt.Sprintf("http://%s:%d/calls", c.Host, c.Port), "application/json", bytes.NewBuffer([]byte(parsedBody)))
+	req, err := http.NewRequest("POST", fmt.Sprintf("http://%s:%d/calls", c.Host, c.Port), bytes.NewBuffer([]byte(parsedBody)))
+	if err != nil {
+		errString := err.Error()
+		return XProtocolClientCallResponse{
+			Success: false,
+			Data:    nil,
+			Error:   &errString,
+		}
+	}
+
+	if xprotoCallRequest.Token != nil {
+		req.Header.Set("Authorization", "Bearer "+*xprotoCallRequest.Token)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	res, err := client.Do(req)
 	if err != nil {
 		errString := err.Error()
 		return XProtocolClientCallResponse{
@@ -86,20 +103,11 @@ func (c *XProtocolClient) Call(xprotoCallRequest XProtocolClientCallRequest) XPr
 		}
 	}
 
-	// if response.Data is a string, convert it to json.RawMessage
-	// if reflect.TypeOf(response.Data).Kind() == reflect.String {
-	// 	response.Data = json.RawMessage(response.Data.(string))
-	// }
-
 	if appMode == "development" {
 		fmt.Println("Call yanıtı alındı -> " + string(response.Data))
 	}
 
-	return XProtocolClientCallResponse{
-		Success: true,
-		Data:    json.RawMessage(response.Data),
-		Error:   response.Error,
-	}
+	return XProtocolClientCallResponse(response)
 }
 
 func NewXProtocolClient(host string, port int) *XProtocolClient {

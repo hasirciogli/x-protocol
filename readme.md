@@ -33,7 +33,7 @@ Bu proje, RPC akrabası olan bir çağrı sistemi geliştirmek amacıyla oluştu
    import (
        "encoding/json"
 
-       "github.com/hasirciogli/x-protocol/packages/go/src/packages"
+       xProtocol "github.com/hasirciogli/x-protocol/packages/go/packages"
    )
 
    type HelloPayload struct {
@@ -42,7 +42,7 @@ Bu proje, RPC akrabası olan bir çağrı sistemi geliştirmek amacıyla oluştu
    }
 
    func main() {
-       server := packages.NewXProtocolServer("localhost", 8080)
+       server := xProtocol.NewXProtocolServer("localhost", 8080)
        server.RegisterCall("hello", func(payload json.RawMessage) json.RawMessage {
            var p HelloPayload
            p.Message = "hello"
@@ -75,7 +75,7 @@ Bu proje, RPC akrabası olan bir çağrı sistemi geliştirmek amacıyla oluştu
 2. **Örnek Client Oluşturun:**
 
    ```typescript
-   import { XProtocolClient } from "x-protocol";
+   import { newXProtocolClient } from "x-protocol/dist/packages/client";
 
    const client = new XProtocolClient("localhost", 8080);
    const response = await client.call("hello", { name: "world" });

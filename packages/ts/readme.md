@@ -8,8 +8,8 @@ Bu proje, RPC akrabası olan bir çağrı sistemi geliştirmek amacıyla oluştu
 
 ### Gereksinimler
 
-- Go 1.16 veya üzeri
-- Node.js 14 veya üzeri
+- Go 1.18 veya üzeri
+- Node.js 16 veya üzeri
 - pnpm
 
 ### GO Kurulum
@@ -18,8 +18,8 @@ Bu proje, RPC akrabası olan bir çağrı sistemi geliştirmek amacıyla oluştu
 
    Modül yüklemeye gerek yoktur. Direkt olarak:
 
-   ```txt
-    github.com/hasirciogli/x-protocol/packages/go/packages
+   ```go
+    import "github.com/hasirciogli/x-protocol/packages/go/packages"
    ```
 
    şeklinde import edebilirsiniz.
@@ -27,7 +27,7 @@ Bu proje, RPC akrabası olan bir çağrı sistemi geliştirmek amacıyla oluştu
 2. **Örnek Server Oluşturun:**
    main.go dosyasını aşağıdaki gibi oluşturun.
 
-   ```GO
+   ```go
    package main
 
    import (
