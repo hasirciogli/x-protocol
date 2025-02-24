@@ -1,8 +1,22 @@
 {
   "name": "x-protocol",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "author": {
+    "email": "mhasirciogli@gmail.com",
+    "name": "Mustafa Hasırcıoğlu",
+    "url": "https://github.com/hasirciogli"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hasirciogli/x-protocol.git",
+    "directory": ""
+  },
+  "homepage": "https://github.com/hasirciogli/x-protocol",
+  "displayName": "X Protocol TypeScript Library",
+  "pricing": "Free",
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch"
