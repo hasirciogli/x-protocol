@@ -75,9 +75,9 @@ Bu proje, RPC akrabası olan bir çağrı sistemi geliştirmek amacıyla oluştu
 2. **Örnek Client Oluşturun:**
 
    ```typescript
-   import { XProtocolClient } from "x-protocol";
+   import { newXProtocolClient } from "x-protocol/dist/packages/client";
 
-   const client = new XProtocolClient("localhost", 8080);
+   const client = newXProtocolClient("localhost", 8080);
    const response = await client.call("hello", { name: "world" });
    console.log(response);
    ```
